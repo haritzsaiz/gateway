@@ -648,12 +648,28 @@ func buildDownstreamQUICTransportSocket(tlsConfig *ir.TLSConfig) (*corev3.Transp
 			})
 	}
 
+	if tlsConfig.RequireClientCertificate {
+		tlsCtx.DownstreamTlsContext.RequireClientCertificate = &wrapperspb.BoolValue{Value: tlsConfig.RequireClientCertificate}
+	}
+
+	var tlsValidationContextSds *tlsv3.SdsSecretConfig
 	if tlsConfig.CACertificate != nil {
-		tlsCtx.DownstreamTlsContext.RequireClientCertificate = &wrapperspb.BoolValue{Value: true}
+		tlsValidationContextSds = &tlsv3.SdsSecretConfig{
+			Name:      tlsConfig.CACertificate.Name,
+			SdsConfig: makeConfigSource(),
+		}
+	}
+	if !tlsConfig.AcceptUntrustedCertificates {
 		tlsCtx.DownstreamTlsContext.CommonTlsContext.ValidationContextType = &tlsv3.CommonTlsContext_ValidationContextSdsSecretConfig{
-			ValidationContextSdsSecretConfig: &tlsv3.SdsSecretConfig{
-				Name:      tlsConfig.CACertificate.Name,
-				SdsConfig: makeConfigSource(),
+			ValidationContextSdsSecretConfig: tlsValidationContextSds,
+		}
+	} else {
+		tlsCtx.DownstreamTlsContext.CommonTlsContext.ValidationContextType = &tlsv3.CommonTlsContext_CombinedValidationContext{
+			CombinedValidationContext: &tlsv3.CommonTlsContext_CombinedCertificateValidationContext{
+				DefaultValidationContext: &tlsv3.CertificateValidationContext{
+					TrustChainVerification: tlsv3.CertificateValidationContext_ACCEPT_UNTRUSTED,
+				},
+				ValidationContextSdsSecretConfig: tlsValidationContextSds,
 			},
 		}
 	}
@@ -690,12 +706,28 @@ func buildXdsDownstreamTLSSocket(tlsConfig *ir.TLSConfig) (*corev3.TransportSock
 			})
 	}
 
-	if tlsConfig.CACertificate != nil {
+	if tlsConfig.RequireClientCertificate {
 		tlsCtx.RequireClientCertificate = &wrapperspb.BoolValue{Value: tlsConfig.RequireClientCertificate}
+	}
+
+	var tlsValidationContextSds *tlsv3.SdsSecretConfig
+	if tlsConfig.CACertificate != nil {
+		tlsValidationContextSds = &tlsv3.SdsSecretConfig{
+			Name:      tlsConfig.CACertificate.Name,
+			SdsConfig: makeConfigSource(),
+		}
+	}
+	if !tlsConfig.AcceptUntrustedCertificates {
 		tlsCtx.CommonTlsContext.ValidationContextType = &tlsv3.CommonTlsContext_ValidationContextSdsSecretConfig{
-			ValidationContextSdsSecretConfig: &tlsv3.SdsSecretConfig{
-				Name:      tlsConfig.CACertificate.Name,
-				SdsConfig: makeConfigSource(),
+			ValidationContextSdsSecretConfig: tlsValidationContextSds,
+		}
+	} else {
+		tlsCtx.CommonTlsContext.ValidationContextType = &tlsv3.CommonTlsContext_CombinedValidationContext{
+			CombinedValidationContext: &tlsv3.CommonTlsContext_CombinedCertificateValidationContext{
+				DefaultValidationContext: &tlsv3.CertificateValidationContext{
+					TrustChainVerification: tlsv3.CertificateValidationContext_ACCEPT_UNTRUSTED,
+				},
+				ValidationContextSdsSecretConfig: tlsValidationContextSds,
 			},
 		}
 	}

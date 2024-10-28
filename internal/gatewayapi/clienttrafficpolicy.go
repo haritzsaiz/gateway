@@ -858,6 +858,10 @@ func (t *Translator) buildListenerTLSParameters(policy *egv1a1.ClientTrafficPoli
 			}
 		}
 
+		if tlsParams.ClientValidation.AcceptUntrusted {
+			irTLSConfig.AcceptUntrustedCertificates = true
+		}
+
 		if len(irCACert.Certificate) > 0 {
 			irTLSConfig.CACertificate = irCACert
 			irTLSConfig.RequireClientCertificate = !tlsParams.ClientValidation.Optional

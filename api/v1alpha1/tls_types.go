@@ -136,6 +136,10 @@ type ClientValidationContext struct {
 	// +kubebuilder:validation:MaxItems=8
 	// +optional
 	CACertificateRefs []gwapiv1.SecretObjectReference `json:"caCertificateRefs,omitempty"`
+
+	// AcceptUntrusted set to true allows connections where the certificate fails verification.
+	// Defaults to false, which rejects connections where the certificate fails verification.
+	AcceptUntrusted bool `json:"acceptUntrusted,omitempty"`
 }
 
 // Session defines settings related to TLS session management.

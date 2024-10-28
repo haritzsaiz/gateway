@@ -704,6 +704,11 @@ spec:
                       ClientValidation specifies the configuration to validate the client
                       initiating the TLS connection to the Gateway listener.
                     properties:
+                      acceptUntrusted:
+                        description: |-
+                          AcceptUntrusted set to true allows connections where the certificate fails verification.
+                          Defaults to false, which rejects connections where the certificate fails verification.
+                        type: boolean
                       caCertificateRefs:
                         description: |-
                           CACertificateRefs contains one or more references to

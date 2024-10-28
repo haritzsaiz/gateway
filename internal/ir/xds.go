@@ -350,6 +350,8 @@ type TLSConfig struct {
 	ClientCertificates []TLSCertificate `json:"clientCertificates,omitempty" yaml:"clientCertificates,omitempty"`
 	// CACertificate to verify the client
 	CACertificate *TLSCACertificate `json:"caCertificate,omitempty" yaml:"caCertificate,omitempty"`
+	// AcceptUntrustedCertificates to accept untrusted certificates
+	AcceptUntrustedCertificates bool `json:"acceptUntrustedCertificates,omitempty" yaml:"acceptUntrustedCertificates,omitempty"`
 	// RequireClientCertificate to enforce client certificate
 	RequireClientCertificate bool `json:"requireClientCertificate,omitempty" yaml:"requireClientCertificate,omitempty"`
 	// MinVersion defines the minimal version of the TLS protocol supported by this listener.
